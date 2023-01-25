@@ -439,6 +439,7 @@ class StableDiffusionPipeline(DiffusionPipeline):
         callback_steps: Optional[int] = 1,
         get_images_for_all_inference_steps = False,
         step_visualization_num = -1,
+        time_steps = None,
     ):
         r"""
         Function invoked when calling the pipeline for generation.
@@ -517,8 +518,11 @@ class StableDiffusionPipeline(DiffusionPipeline):
 
         # 4. Prepare timesteps
         self.scheduler.set_timesteps(num_inference_steps, device=device)
-        timesteps = self.scheduler.timesteps
-
+        if time_steps is None:
+            timesteps = self.scheduler.timesteps
+        else:
+            timesteps = time_steps
+            self.scheduler.timesteps = time_steps
         # 5. Prepare latent variables
         num_channels_latents = self.unet.in_channels
         # (1, 4, 96, 96)
